@@ -1,18 +1,19 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import List from "./List.jsx";
 import ListPageHeader from "./ListPageHeader";
+import axios from "axios"
+import Axios from "../Helpers/Axios";
 
 function App() {
 	let [list, changeList] = useState([
-		"Note This List cannot be saved",
-		"Click on a list item to remove it",
 	]);
 
 	let addList = (list, pos) => {
-		return <List key={pos} value={list} pos={pos} remover={remItem} />;
+		return <List key={pos} value={list} id={list._id} pos={pos} remover={remItem} />;
 	};
 
-	let remItem = (pos) => {
+	let remItem = (pos,id) => {
+		axios.delete("http://localhost:5000/",{data:{id}})
 		changeList(function (prevList) {
 			return prevList.filter((item, index) => {
 				return index !== pos;
@@ -30,10 +31,20 @@ function App() {
 		evt.preventDefault();
 		let newItem = inputVal;
 		changeInputVal("");
-		changeList((previousList) => {
-			return [...previousList, newItem];
-		});
+		Axios.post("/",{title:newItem}).then(({data:{InsertedID}}) => {
+			changeList((previousList) => {
+				return [...previousList, {title:newItem,_id:InsertedID}];
+			});
+		}).catch(err => console.error(err))
 	};
+	useEffect(() => {
+			Axios.get("/list").then((response) => {
+				if(response.data)
+				changeList(old => {
+					return [...old,...response.data]
+				})
+			})
+	}, []);
 
 	return (
 		<div className='container'>

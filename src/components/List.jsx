@@ -1,15 +1,14 @@
-import React,{useState} from "react";
+import React from "react";
 
 function List(props){
-  let [decoration,changeDecoration] = useState("none");
   function handleClick(){
     
-    props.remover(props.pos);
+    props.remover(props.pos,props.id);
   }
 
 
   return <li  onClick={handleClick}>
-    {props.value}
+    {props.value.title}
   </li>;
 }
 
